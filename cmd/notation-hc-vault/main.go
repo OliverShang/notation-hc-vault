@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"os"
@@ -13,12 +14,14 @@ func main() {
 		help()
 		return
 	}
-	//ctx := context.Background()
+	ctx := context.Background()
 	var err error
 	var resp any
 	switch proto.Command(os.Args[1]) {
 	case proto.CommandGetMetadata:
 		resp = runGetMetadata()
+	case proto.CommandDescribeKey:
+		resp, err = runDescribeKey(ctx, os.Stdin)
 	default:
 		err = fmt.Errorf("invalid command: %s", os.Args[1])
 	}
