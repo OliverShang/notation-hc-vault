@@ -1,7 +1,7 @@
 package version
 
 var (
-	Version = "xxx"
+	Version = "v0.1.0"
 
 	BuildMetadata = "unreleased"
 )

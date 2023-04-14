@@ -4,9 +4,13 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/OliverShang/notation-hc-vault/internal/keyvault"
+	"github.com/notaryproject/notation-core-go/signature"
 	"github.com/notaryproject/notation-go/plugin/proto"
 	"io"
 )
+
+var NewVaultClientFromKeyID = keyvault.NewVaultClientFromKeyID
 
 func runDescribeKey(ctx context.Context, input io.Reader) (*proto.DescribeKeyResponse, error) {
 	// parse input request
@@ -31,5 +35,20 @@ func runDescribeKey(ctx context.Context, input io.Reader) (*proto.DescribeKeyRes
 }
 
 func notationKeySpec(ctx context.Context, keyID string) (proto.KeySpec, error) {
-	return "", nil
+	vaultClient, err := NewVaultClientFromKeyID(keyID)
+	if err != nil {
+		return "", err
+	}
+
+	certs, err := vaultClient.GetCertificateChain(ctx)
+	if err != nil {
+		return "", err
+	}
+	leafCert := certs[0]
+	// extract key spec from certificate
+	keySpec, err := signature.ExtractKeySpec(leafCert)
+	if err != nil {
+		return "", err
+	}
+	return proto.EncodeKeySpec(keySpec)
 }

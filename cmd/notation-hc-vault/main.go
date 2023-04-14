@@ -22,6 +22,8 @@ func main() {
 		resp = runGetMetadata()
 	case proto.CommandDescribeKey:
 		resp, err = runDescribeKey(ctx, os.Stdin)
+	case proto.CommandGenerateSignature:
+		resp, err = runSign(ctx, os.Stdin)
 	default:
 		err = fmt.Errorf("invalid command: %s", os.Args[1])
 	}
@@ -35,7 +37,7 @@ func main() {
 
 	// output the error
 	if err != nil {
-		data, _ := json.Marshal(wrapError(err))
+		data, _ := json.Marshal(err)
 		os.Stderr.Write(data)
 		os.Exit(1)
 	}
