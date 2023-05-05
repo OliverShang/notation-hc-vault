@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"github.com/hashicorp/vault-client-go"
 	"log"
-	"strings"
 	"testing"
 	"time"
 )
@@ -55,28 +54,28 @@ func TestVaultClient(t *testing.T) {
 		log.Fatal(err)
 	}
 
-	certificateString := `-----BEGIN CERTIFICATE-----
-MIIDPjCCAiagAwIBAgIBMDANBgkqhkiG9w0BAQsFADBOMQswCQYDVQQGEwJVUzEL
-MAkGA1UECBMCV0ExEDAOBgNVBAcTB1NlYXR0bGUxDzANBgNVBAoTBk5vdGFyeTEP
-MA0GA1UEAxMGYWxwaW5lMB4XDTIzMDMyNDA2Mzk0N1oXDTIzMDMyNTA2Mzk0N1ow
-TjELMAkGA1UEBhMCVVMxCzAJBgNVBAgTAldBMRAwDgYDVQQHEwdTZWF0dGxlMQ8w
-DQYDVQQKEwZOb3RhcnkxDzANBgNVBAMTBmFscGluZTCCASIwDQYJKoZIhvcNAQEB
-BQADggEPADCCAQoCggEBALpA+PpuI4H0qhluNHgrB8Wbnm+/PimQF9gm2XUotEJT
-WE8AvGdDLOjxerijQboZjoSGYVvJoux5LGvc8ntamR2Smv4j4xd5hIhsoAL/kHtP
-R+9nLBW9g3QhtOiGeKJJ392r7Pe6gfttC2nSzBs4wol3jSO6+GFCN4CAVDKHz/CS
-iXrsEaHA6Aqbl2AO69MHx5NUXvamsuUvCc/s1dVjBNfrd0YxSiLmna8Tz0UM5LC7
-YOPjLCbVM5YFxinHsg39bFpO20xYs44q09CDV+KWSESx9bgXgjo3o//2b8pXGFJ0
-qfgKGLS9IyByVILbpA8rBbvrZE5rBNVAblx+owhJDzkCAwEAAaMnMCUwDgYDVR0P
-AQH/BAQDAgeAMBMGA1UdJQQMMAoGCCsGAQUFBwMDMA0GCSqGSIb3DQEBCwUAA4IB
-AQBLsUVKlU72vnN9i3Mdi4+8hacby+lCt94wnNc3IOBWxCeLgA+W1p4quoAwle8r
-/mKWoK6kpEoCKMZlmyfJKrgMkw7EXVWeAJbsvRDhB69La9VxLPnQX7Wo9zT7WNwG
-1w6naDg6AIFVPeIJzAobaxCYBx7P0YgFOvj2Y/DJTMnTvOj2DwCMqlCsezRBTmrr
-uAdTqBHlUVcmQZvIEcIXGX0myOwfeGSq42ei+UaMk4rZKJ9DPTGSrXak6t1DuAxz
-yolwIT27dtyT8xSNv1xvCSO5d/APqynhbRp1YLOmMCpvYRE5AadPSr4SPeN6boqk
-klbZj7vMmIqdC4i1P+BLmzmn
------END CERTIFICATE-----`
-
-	certificateString = strings.Replace(certificateString, "\n", "", -1)
+	//	certificateString := `-----BEGIN CERTIFICATE-----
+	//MIIDPjCCAiagAwIBAgIBMDANBgkqhkiG9w0BAQsFADBOMQswCQYDVQQGEwJVUzEL
+	//MAkGA1UECBMCV0ExEDAOBgNVBAcTB1NlYXR0bGUxDzANBgNVBAoTBk5vdGFyeTEP
+	//MA0GA1UEAxMGYWxwaW5lMB4XDTIzMDMyNDA2Mzk0N1oXDTIzMDMyNTA2Mzk0N1ow
+	//TjELMAkGA1UEBhMCVVMxCzAJBgNVBAgTAldBMRAwDgYDVQQHEwdTZWF0dGxlMQ8w
+	//DQYDVQQKEwZOb3RhcnkxDzANBgNVBAMTBmFscGluZTCCASIwDQYJKoZIhvcNAQEB
+	//BQADggEPADCCAQoCggEBALpA+PpuI4H0qhluNHgrB8Wbnm+/PimQF9gm2XUotEJT
+	//WE8AvGdDLOjxerijQboZjoSGYVvJoux5LGvc8ntamR2Smv4j4xd5hIhsoAL/kHtP
+	//R+9nLBW9g3QhtOiGeKJJ392r7Pe6gfttC2nSzBs4wol3jSO6+GFCN4CAVDKHz/CS
+	//iXrsEaHA6Aqbl2AO69MHx5NUXvamsuUvCc/s1dVjBNfrd0YxSiLmna8Tz0UM5LC7
+	//YOPjLCbVM5YFxinHsg39bFpO20xYs44q09CDV+KWSESx9bgXgjo3o//2b8pXGFJ0
+	//qfgKGLS9IyByVILbpA8rBbvrZE5rBNVAblx+owhJDzkCAwEAAaMnMCUwDgYDVR0P
+	//AQH/BAQDAgeAMBMGA1UdJQQMMAoGCCsGAQUFBwMDMA0GCSqGSIb3DQEBCwUAA4IB
+	//AQBLsUVKlU72vnN9i3Mdi4+8hacby+lCt94wnNc3IOBWxCeLgA+W1p4quoAwle8r
+	///mKWoK6kpEoCKMZlmyfJKrgMkw7EXVWeAJbsvRDhB69La9VxLPnQX7Wo9zT7WNwG
+	//1w6naDg6AIFVPeIJzAobaxCYBx7P0YgFOvj2Y/DJTMnTvOj2DwCMqlCsezRBTmrr
+	//uAdTqBHlUVcmQZvIEcIXGX0myOwfeGSq42ei+UaMk4rZKJ9DPTGSrXak6t1DuAxz
+	//yolwIT27dtyT8xSNv1xvCSO5d/APqynhbRp1YLOmMCpvYRE5AadPSr4SPeN6boqk
+	//klbZj7vMmIqdC4i1P+BLmzmn
+	//-----END CERTIFICATE-----`
+	//
+	//	certificateString = strings.Replace(certificateString, "\n", "", -1)
 	// write a secret
 	//_, err = client.Secrets.KVv2Write(ctx, "alpine", schema.KVv2WriteRequest{
 	//	Data: map[string]any{
@@ -86,10 +85,10 @@ klbZj7vMmIqdC4i1P+BLmzmn
 	//if err != nil {
 	//	log.Fatal(err)
 	//}
-	log.Println("secret written successfully")
+	//log.Println("secret written successfully")
 
 	// read a secret
-	s, err := client.Secrets.KVv2Read(ctx, "alpine")
+	s, err := client.Secrets.KVv2Read(ctx, "anything")
 	if err != nil {
 		log.Fatal(err)
 	}

@@ -9,6 +9,7 @@ import (
 	"encoding/pem"
 	"fmt"
 	"github.com/google/tink/go/kwp/subtle"
+	notationx509 "github.com/notaryproject/notation-core-go/x509"
 	"testing"
 )
 
@@ -27,36 +28,45 @@ sp6X9HvsAvdtZ9GiiE3n4C0XDa/NIDmZX0YGhILWBTaQxplOWjsOdm5W+qem1qq2
 ysMvi+wOda6wRjdWCVkc1BYhtPOm7N9BYW9n0ICEdkgdGMCNPRBwYbv1DFoQsi39
 PleKNglAUhgxDk2TfMVOr7cCAwEAAQ==
 -----END PUBLIC KEY-----`
-	privateKeyString := `-----BEGIN PRIVATE KEY-----
-MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQC0X4i6Kuknpw5Y
-gmOP5MSDkJlqkOl1hvpmIuD34+C9TpBvT0Udnxb+s2rxcC4VIFSvi5su5V32TuTe
-VgYWOacnPe2pUtkAz6/4XnkRBQda/Qe2GD95C3FI7r0gZoZIqzx/sfFKr1ejpoyj
-R6YZuuiN3ZwUQ+s8BVH7uhHxFNVXXN7hK4dT0zd0ETuVD+YFERQoDE68T8gsqpQA
-p3+uBYjyEe9tGEVwBxUHuzHY5lBNcpK5VoznBAYhVV6T5ze7axcb2OvyseL+D9GJ
-XIrFbUw8d/J6WyKbfpxGSonnUgAbtXGlBZpG1g79ortiLU9Z0deis9y8N3N0NAYg
-e0tHMkuJAgMBAAECggEASjKOXP6v4Ibg6NniONwDVpeR9Htd/eGjeYZZgr9zwIvj
-8FXseY3q+KU3lc/utPQSwg+sq3Lg3yR/E1LRuCzJLORVsnSJHcNRgNrj9HNcHjq+
-BFMfMRza4gSLOhvSm2wNO/4n4vAUHhax/azIkAcKCOmjfdaempcZrXJSVRib1g6F
-uwiPGEaKvpPBmxqyJoMHb2W+eJwQaPwqkap6qvq2y5ZfMjiiGBdaupGofeOHivWL
-nB9LQpnDa5W0wc/+enABB+0mdqRBx4RZJaFS9FOKqnGjuGXljeR1yLnXgZ78kEu/
-BqCQJ/TKBwVPX0m67dyDPaheervLZuKCqKz6mZkWrQKBgQDnmvY3pCCzrbVwA2+P
-C4GHHmiaA30MJe82YoXx+gBCmleWw8Cpk7q9co7JmKdOeOXMedylJQq0IV8FJVx7
-TAZ3DhJyVcHGcEpnvmaKt15AO2xKtpQRUtUDrplH/lxBCYqkyA1e0QqcrzfWGtBG
-Ol8XtYtsUW6rVUJai17dipcmbwKBgQDHXyRIrg7X3CMty7gpnGd8/EvI3nDcK2Fv
-Ku+SzFOUgpTSEglBUdpr55geYI0Mw9E5lpyK76/cHUs/uyD1XlMIy1SsJvao4ukB
-0BpuMRMv6u+o7EMkM6EBXlmn0zqIbcpKVDat6zZI+POE15rtiBku82tiSUe4vZVY
-jttQCZ7phwKBgAdveigfJM2f7gtCkPpOrEHiQAlxwzn4nc1pLFOwawG4Ysd8UVsg
-WwZp/xuJwxVJ3FbMMsE6hzVxPNO1d1qd/jckRINXLXlpcXoTKseZS3VUcw2S/v3v
-YtdTa6hcCiosXD8eDQ/WNjkBhxFgmv8mMJdaRLedhagKfK7bepgyMtgRAoGAT3ab
-VqCRZ/Xky5b78xHUqZtBdXE7WHWt4wog7Mils3aMbGIl8DP4s7NeDRV8go71sFdY
-U4QO+tNuL5udGk8bF1E7kVYCT/QI3OEd97d1p06jcReh9ybg0FPTtjFZjhD8ZL3G
-AXHTdChNny/0HyJ0ryL0NPtyK67cfKyLuw3qmbcCgYEA2a2Q2Im2+4PojE8lAkaP
-jLFFI+I3j+jVYlR3thngf6XdaZO5qwOQaRIHleNsThONOm4SKkfMnxe8XNkSa1yS
-+mrZ154+XRt7hCvRp2JAvUuPom0Ixk3FjRENAy02wpQ+hKLZ+brG/Og+45FXFVC9
-MxV3oPpY1uAoIQ2Mo1bmsa8=
------END PRIVATE KEY-----`
+	//	privateKeyString := `-----BEGIN RSA PRIVATE KEY-----
+	//MIIEowIBAAKCAQEApx8OlFrFfiHzFK5T5z78pA1fge4vMt2o7oNe2FjtuYpEdPXV
+	//MwBt2e+4Yt1AQ9vXMzYEHxcs69eY6rfJx0iyg/DR6eNLkHfebGjel82kWVfuhl4r
+	//tEmGe8MlKD6Y21+rSpLEItkaGHCNZdi3vfFWQZvUIhPdO4eZNYMSW9I60F/bkzeI
+	//SQ7ZSGzUfzjYJUHnAV8bPNH63I18rWd34TzXWdIQCX2lhSQGPR4zMxHqUKgC4RUq
+	//MjUWwqqgUb1BG/beIfMEVT84uAEeeMCQWnIuNDfuFmEwazkkDjrsD/Lmed0Ij+Te
+	//GC0FkTupaNwvAuvLcF9pUc29WrgxTaYiaFsF1QIDAQABAoIBAA5EdX8u3KtvBIyg
+	//cWNNmk37Iks6ZWcnS1PJfWBk/y6W4k9F6YSoJbi0YX53OxRQAWhK1UE+PkSILHLl
+	//a+GKkEr5VUJteDcGNMP2lAJLuRsziZaJFZwXptaMC3ELHwujeEEulHYRKMwrV7b5
+	//MH6TyvRg9FRQc9OwOOE7pmaWZRUC5qKtVk9WLhzqRNdHMJ7Q83GXCeNu74wUbuUj
+	//I10PpBtzHYpPccYAlXIJzRtz1T66/KjMF8Jwjy0A3OMVZ37Kk7lLAxNkr1lg/3JP
+	//MOnDpGbhGWoa9PxP7T7ZG6wSg3h+NtblRSVw5VVmooWC8kq6gC+CBiJ1xe49tzd6
+	//0/40TQUCgYEA2kvilZJAGt/xQOu7I7dJSzTVmEVty0EEkvOgcNYysPKtGXzGF0tu
+	//XBSdQX2k3Zgx9MBa0RVuK0gB2gQ+w8Wwub2hKSkyNyUsVJZiUPGSREHRv1tHwn2D
+	//75ZoA+5OcQ/nZTYOmOyIjjcw+3bDSLFaroZ/m0HZu/IQ3f5fs/w03fcCgYEAw/xu
+	//klKsRQPw8xZ8kMk5+xUJd4GIvsZRF8Zng3zsieqK/1xmeT/HWfd9GBXtIdVp3dH+
+	//opIf1vSA4ZNB4iBquQKwvETQtnDRuyMVHuzxwDG/QR10tO2ezh/GWJbbzCpUG3QB
+	//AOrCfe1If4sUvrWkkBQwKtTjMgu9uXjRmMpMt5MCgYEAj3RnBtwBfKfGJ1/Cr4n3
+	//hJDH/TVDHdswYlHwEbbxwQ75alJw60YK1EBHx44GFgm6apkuFVD8AT1k2h0IEieM
+	//J8PScPY9pbesFjptibv23xxR9mrKEaniVkSFPnAQ5IQLEJwho6VtZ+glLFuzocXL
+	//Tf3dRe5UZAqDwx8zTVhkdakCgYAG1tVI9+eZFPUgloVMTClg0LAe4n9SIPuNd9f+
+	//56odefjVxnSxAH/FbPSJlaJLzvW9zuky5SSFTMz+kjP3Xyg6QpTGTSR3aWJ4RFYl
+	//WSFqkpHZBN0gvzYOfV9fkgwjiMqclqS+UnLtEA26nbDgotgWSw4PQJSZF33MbiHq
+	//UgzxTwKBgA+k88u67S9gRqcbYqWmyFHha9lqrxg2UjbOXBvc9YpUwDytfRe5ziAW
+	//4GJHHDVlJJT5k9etev6T33WMsPUn5vw/gEMLUlojbyNg6KoYWZAXZR6Un9QjQYGR
+	//lAgfu+Heic94dkZuWbB7MuVYisnphbl9fIPpkTK+JUKDqv7Sd7kk
+	//-----END RSA PRIVATE KEY-----`
+	privateKeyPath := "C:\\Users\\creep\\vault\\openssl\\leaf.key"
 	keyBlock, _ := pem.Decode([]byte(wrappingKeyString))
-	privateKeyBlock, _ := pem.Decode([]byte(privateKeyString))
+	//privateKeyBlock, _ := pem.Decode([]byte(privateKeyString))
+	//privateKey, err := x509.ParsePKCS8PrivateKey(privateKeyBlock.Bytes)
+	privateKey, err := notationx509.ReadPrivateKeyFile(privateKeyPath)
+	if err != nil {
+		panic(err)
+	}
+	pkcs8PrivateKey, err := x509.MarshalPKCS8PrivateKey(privateKey)
+	if err != nil {
+		panic(err)
+	}
 	parsedKey, err := x509.ParsePKIXPublicKey(keyBlock.Bytes)
 	if err != nil {
 		fmt.Print(err)
@@ -70,7 +80,7 @@ MxV3oPpY1uAoIQ2Mo1bmsa8=
 	if err != nil {
 		fmt.Print(err)
 	}
-	wrappedTargetKey, err := wrapKWP.Wrap(privateKeyBlock.Bytes)
+	wrappedTargetKey, err := wrapKWP.Wrap(pkcs8PrivateKey)
 	if err != nil {
 		fmt.Print(err)
 	}

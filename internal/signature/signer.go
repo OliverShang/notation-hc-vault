@@ -7,10 +7,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/OliverShang/notation-hc-vault/internal/keyvault"
-	"github.com/hashicorp/vault-client-go"
-	"github.com/hashicorp/vault-client-go/schema"
 	"github.com/notaryproject/notation-go/plugin/proto"
-	"time"
 )
 
 func Sign(ctx context.Context, req *proto.GenerateSignatureRequest) (*proto.GenerateSignatureResponse, error) {
@@ -23,23 +20,11 @@ func Sign(ctx context.Context, req *proto.GenerateSignatureRequest) (*proto.Gene
 		}
 	}
 
-	// prepare a client with the given base address
-	client, err := vault.New(
-		vault.WithAddress("http://127.0.0.1:8200"),
-		vault.WithRequestTimeout(30*time.Second),
-	)
+	vaultClient, err := keyvault.NewVaultClientFromKeyID(req.KeyID)
 	if err != nil {
 		return nil, &proto.RequestError{
 			Code: proto.ErrorCodeGeneric,
-			Err:  fmt.Errorf("failed to prepare a client, %v", err),
-		}
-	}
-
-	// authenticate with a root token (insecure for dev)
-	if err := client.SetToken("root"); err != nil {
-		return nil, &proto.RequestError{
-			Code: proto.ErrorCodeGeneric,
-			Err:  fmt.Errorf("failed to authenticate with a root token, %v", err),
+			Err:  fmt.Errorf("failed to get vault client, %v", err),
 		}
 	}
 
@@ -86,15 +71,7 @@ func Sign(ctx context.Context, req *proto.GenerateSignatureRequest) (*proto.Gene
 		}
 	}
 	encodedHash := base64.StdEncoding.EncodeToString(hashData)
-	resp, err := client.Secrets.TransitSign(ctx, req.KeyID, schema.TransitSignRequest{
-		Input:               encodedHash,
-		MarshalingAlgorithm: "asn1",
-		KeyVersion:          0,
-		Prehashed:           true,
-		SaltLength:          "auto",
-		SignatureAlgorithm:  signAlgorithm,
-	})
-
+	sigBytes, err := vaultClient.SignWithTransit(ctx, encodedHash, signAlgorithm)
 	if err != nil {
 		return nil, &proto.RequestError{
 			Code: proto.ErrorCodeGeneric,
@@ -102,21 +79,11 @@ func Sign(ctx context.Context, req *proto.GenerateSignatureRequest) (*proto.Gene
 		}
 	}
 
-	signature := resp.Data["signature"].(string)
-
 	signatureAlgorithmString, err := proto.EncodeSigningAlgorithm(keySpec.SignatureAlgorithm())
 	if err != nil {
 		return nil, &proto.RequestError{
 			Code: proto.ErrorCodeGeneric,
 			Err:  fmt.Errorf("failed to encode signing algorithm, %v", err),
-		}
-	}
-
-	vaultClient, err := keyvault.NewVaultClientFromKeyID(req.KeyID)
-	if err != nil {
-		return nil, &proto.RequestError{
-			Code: proto.ErrorCodeGeneric,
-			Err:  fmt.Errorf("failed to get vault client, %v", err),
 		}
 	}
 
@@ -130,7 +97,7 @@ func Sign(ctx context.Context, req *proto.GenerateSignatureRequest) (*proto.Gene
 
 	return &proto.GenerateSignatureResponse{
 		KeyID:            req.KeyID,
-		Signature:        []byte(signature),
+		Signature:        sigBytes,
 		SigningAlgorithm: string(signatureAlgorithmString),
 		CertificateChain: rawCertChain,
 	}, nil
