@@ -55,17 +55,21 @@ import key to Vault Transit secrets engine and certificates to Vault KV secrets 
 		if err != nil {
 			fmt.Println(err)
 		}
+		fmt.Println("Successfully got vault client")
 		wrappingKey, err := getWrappingKey(ctx, vaultClient)
 		if err != nil {
 			fmt.Println(err)
 		}
+		fmt.Println("Successfully got wrapping key")
 		ciphertext, err := wrapPrivateKey(wrappingKey, keyPath)
 		if err := importKeyToTransit(ctx, vaultClient, ciphertext, keyName); err != nil {
 			fmt.Println(err)
 		}
+		fmt.Println("Successfully imported key to transit")
 		if err := importCertToKV(ctx, vaultClient, certPath, keyName); err != nil {
 			fmt.Println(err)
 		}
+		fmt.Println("Successfully imported cert to kv")
 	},
 }
 
