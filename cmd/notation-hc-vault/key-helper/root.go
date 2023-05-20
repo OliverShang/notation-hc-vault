@@ -1,4 +1,4 @@
-package cmd
+package key_helper
 
 import (
 	"fmt"

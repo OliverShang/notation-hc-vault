@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	key_helper "github.com/OliverShang/notation-hc-vault/cmd/notation-hc-vault/key-helper"
 	"os"
 
 	"github.com/notaryproject/notation-go/plugin/proto"
@@ -25,6 +26,9 @@ func main() {
 	case proto.CommandGenerateSignature:
 		resp, err = runSign(ctx, os.Stdin)
 	default:
+		if os.Args[1] == "import" {
+			key_helper.Execute()
+		}
 		err = fmt.Errorf("invalid command: %s", os.Args[1])
 	}
 
