@@ -47,10 +47,6 @@ func main() {
 	}
 }
 
-func wrapError(err error) *proto.RequestError {
-	return nil
-}
-
 func help() {
 	fmt.Print("Help not implemented yet.")
 }
