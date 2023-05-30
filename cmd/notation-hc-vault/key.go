@@ -24,6 +24,7 @@ func runDescribeKey(ctx context.Context, input io.Reader) (*proto.DescribeKeyRes
 
 	// get key spec for notation
 	keySpec, err := notationKeySpec(ctx, req.KeyID)
+
 	if err != nil {
 		return nil, err
 	}
